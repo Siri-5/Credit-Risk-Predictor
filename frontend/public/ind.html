@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Credit Status Prediction</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        h2 {
+            color: #5f6368;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h3, h4 {
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2em;
+            text-align: center;
+        }
+
+        /* Form styles */
+        form {
+            width: 60%;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #5f6368;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        input[type="submit"] {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        /* Prediction and Suggestions Section */
+        h3, h2 {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+            font-size: 1.1em;
+        }
+
+        li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fafafa;
+            border-radius: 5px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        li strong {
+            color: #d9534f;
+        }
+
+        /* SHAP Plot Section */
+        img {
+            display: block;
+            margin: 0 auto;
+            max-width: 80%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            form {
+                width: 90%;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            input[type="submit"] {
+                font-size: 1em;
+            }
+        }
+
+        /* Centering suggestions */
+        .suggestions-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 30px;
+            text-align: left;
+            background-color: #f8d7da;
+            padding: 20px;
+            border-radius: 8px;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .suggestions-container h3 {
+            margin-bottom: 10px;
+        }
+
+        .suggestions-container ul {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Credit Status Prediction Form</h2>
+
+    <form method="POST" action="/predict" id="prediction-form">
+        <!-- Form fields will be dynamically inserted here by JavaScript -->
+         
+    </form>
+
+    <h2 id="prediction-result"></h2>
+
+    <div id="suggestions-container" class="suggestions-container" style="display: none;">
+        <h3>🛠️ Suggestions to Improve:</h3>
+        <ul id="suggestions-list"></ul>
+    </div>
+
+    <h3 id="shap-values-heading" style="display: none;">Feature Impact (SHAP VALUES)</h3>
+    <img id="shap-plot" src="" alt="SHAP Feature Impact" style="display: none;"/>
+
+    <script>
+        const categoricalMappings = {
+            'current_account': {'0_to_200_DM': 0, 'more_than_200_DM': 1, 'no_balance_or_debit': 2, 'no_running_account': 3},
+            'duration': {'<06': 0, '>54': 1, 'from_06_to_12': 2, 'from_12_to_18': 3, 'from_18_to_24': 4, 'from_24_to_30': 5, 'from_30_to_36': 6, 'from_36_to_42': 7, 'from_42_to_48': 8, 'from_48_to_54': 9},
+            'previous_credit': {'hesitant_pmt_of_previous_credit': 0, 'no_previous_credit_or_paid_back_all_previous_credits': 1, 'no_problems_current_credit_at_bank': 2, 'paid_back_previous_credits_at_this_bank': 3, 'problematic_running_account': 4},
+            'purpose': {'business': 0, 'furniture': 1, 'household_appliances': 2, 'new_car': 3, 'other': 4, 'radio_television': 5, 'repair': 6, 'retraining': 7, 'used_car': 8, 'vacation': 9},
+            'amount': {'from_0.5K_to_1K': 0, 'from_1.5K_to_2.5K': 1, 'from_10K_to_15K': 2, 'from_15K_to_20K': 3, 'from_1K_to_1.5K': 4, 'from_2.5K_to_5K': 5, 'from_5K_to_7.5K': 6, 'from_7.5K_to_10K': 7, 'less_than_0.5K': 8},
+            'value_saving_stocks': {'from_100_to_500_DM': 0, 'from_500_to_1000_DM': 1, 'less_than_100_DM': 2, 'more_than_1000_DM': 3, 'not_available_or_no_savings': 4},
+            'tenure': {'from_1_to_4_years': 0, 'from_4_to_7_years': 1, 'less_than_1_year': 2, 'more_than_7_years': 3, 'unemployed': 4},
+            'install_rate': {'from_20_to_25_percent': 0, 'from_20_to_35_percent': 1, 'less_than_20_percent': 2, 'more_than_35_percent': 3},
+            'marital_status_sex': {'female_not_single_or_male_single': 0, 'female_single': 1, 'male_divorced_or_separated': 2, 'male_married_or_widowed': 3},
+            'debtor_guarantors': {'Co-Applicant': 0, 'Guarantor': 1, 'none': 2},
+            'living_at_current_address': {'from_1_to_4_years': 0, 'from_4_to_7_years': 1, 'less_than_1_year': 2, 'more_than_7_years': 3},
+            'valueable_assets': {'car_or_other': 0, 'house_or_land': 1, 'not_available_or_no_assets': 2, 'saving_contract_or_life_insurance': 3},
+            'age': {'from_26_to_39': 0, 'from_40_to_59': 1, 'from_60_to_64': 2, 'less_than_25': 3, 'more_than_65': 4},
+            'other_credits': {'at_department_stores': 0, 'at_other_banks': 1, 'no_further_running_credits': 2},
+            'apartment_type': {'free_apartment': 0, 'owner_occupied_flat': 1, 'rented_flat': 2},
+            'credits_at_bank': {'four_or_five': 0, 'one': 1, 'six_or_more': 2, 'two_or_three': 3},
+            'occupation': {'executive': 0, 'skilled_worker': 1, 'unemployed_or_unskilled_with_no_permanent_residence': 2, 'unskilled_with_permanent_residence': 3},
+            'num_dependents': {'three_or_more': 0, 'up_to_two': 1},
+            'broadband': {'no': 0, 'yes': 1},
+            'foreign_worker': {'no': 0, 'yes': 1}
+        };
+
+        const customLabels = {
+            "age": {
+                "less_than_25": "Below 25 years",
+                "from_26_to_39": "26 – 39 years",
+                "from_40_to_59": "40 – 59 years",
+                "from_60_to_64": "60 – 64 years",
+                "more_than_65": "Above 65 years"
+            },
+            "amount": {
+                "less_than_0.5K": "Less than ₹12,500",
+                "from_0.5K_to_1K": "₹12,500 – ₹25,000",
+                "from_1K_to_1.5K": "₹25,000 – ₹37,500",
+                "from_1.5K_to_2.5K": "₹37,500 – ₹62,500",
+                "from_2.5K_to_5K": "₹62,500 – ₹1.25L",
+                "from_5K_to_7.5K": "₹1.25L – ₹1.87L",
+                "from_7.5K_to_10K": "₹1.87L – ₹2.5L",
+                "from_10K_to_15K": "₹2.5L – ₹3.75L",
+                "from_15K_to_20K": "₹3.75L – ₹5L"
+            },
+            "current_account": {
+    "0_to_200_DM": "₹0 – ₹5,000 balance",
+    "more_than_200_DM": "More than ₹5,000 balance",
+    "no_balance_or_debit": "No balance / Overdrawn",
+    "no_running_account": "No current account"
+},
+"value_saving_stocks": {
+    "less_than_100_DM": "Less than ₹2,500 in savings",
+    "from_100_to_500_DM": "₹2,500 – ₹12,500 in savings",
+    "from_500_to_1000_DM": "₹12,500 – ₹25,000 in savings",
+    "more_than_1000_DM": "More than ₹25,000 in savings",
+    "not_available_or_no_savings": "Not available / No savings"
+},
+
+ "install_rate": {
+        "from_20_to_25_percent": "20% – 25%",
+        "from_20_to_35_percent": "25% – 35%",
+        "less_than_20_percent": "Less than 20%",
+        "more_than_35_percent": "More than 35%"
+    }
+        };
+
+        const formElement = document.getElementById("prediction-form");
+
+        function generateForm() {
+    // Loop through all fields in categoricalMappings
+    Object.keys(categoricalMappings).forEach(field => {
+        const label = document.createElement("label");
+        label.textContent = field;
+        const select = document.createElement("select");
+        select.name = field;
+
+        // Ensure that we check if customLabels exist for the current field
+        const fieldLabels = customLabels[field] || {};
+
+        for (const [key, value] of Object.entries(categoricalMappings[field])) {
+            const option = document.createElement("option");
+            // Use custom label if available, else use the key itself
+            option.value = value;
+            option.textContent = fieldLabels[key] || key; 
+            select.appendChild(option);
+        }
+
+        formElement.appendChild(label);
+        formElement.appendChild(select);
+    });
+
+    const submitButton = document.createElement("input");
+    submitButton.type = "submit";
+    submitButton.value = "Submit";
+    formElement.appendChild(submitButton);
+}
+
+
+        generateForm();
+        formElement.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            let formData = new FormData(formElement);
+            let inputData = {};
+            for (let [key, value] of formData.entries()) {
+                inputData[key] = value;
+            }
+
+            console.log(inputData); // You can log the inputs here for debugging
+
+            // Here, you would call your prediction API, for example:
+            // fetch('/your-api-endpoint', { method: 'POST', body: JSON.stringify(inputData), ... })
+            // This would send the data to a backend to get the prediction result
+
+            // For demo purposes, we'll simulate a result:
+            document.getElementById("prediction-result").textContent = "Prediction: Acceptable";
+
+            // Display suggestions
+            const suggestionsList = document.getElementById("suggestions-list");
+            suggestionsList.innerHTML = "<li>Consider improving your credit history.</li><li>Increase your savings.</li>";
+            document.getElementById("suggestions-container").style.display = "block";
+        });
+    </script>
+</body>
+</html>
+
+<!-- <!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Credit Status Prediction</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        h2 {
+            color: #5f6368;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h3, h4 {
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2em;
+            text-align: center;
+        }
+
+        /* Form styles */
+        form {
+            width: 60%;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #5f6368;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        input[type="submit"] {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        /* Prediction and Suggestions Section */
+        h3, h2 {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+            font-size: 1.1em;
+        }
+
+        li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fafafa;
+            border-radius: 5px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        li strong {
+            color: #d9534f;
+        }
+
+        /* SHAP Plot Section */
+        img {
+            display: block;
+            margin: 0 auto;
+            max-width: 80%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            form {
+                width: 90%;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            input[type="submit"] {
+                font-size: 1em;
+            }
+        }
+
+        /* Centering suggestions */
+        .suggestions-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 30px;
+            text-align: left;
+            background-color: #f8d7da;
+            padding: 20px;
+            border-radius: 8px;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .suggestions-container h3 {
+            margin-bottom: 10px;
+        }
+
+        .suggestions-container ul {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Credit Status Prediction Form</h2>
+
+    <form method="POST">
+        {% for feature, options in mappings.items() %}
+            <label>{{ feature.replace("_", " ").title() }}</label>
+            <select name="{{ feature }}">
+                {% for label in options.keys() %}
+                    <option value="{{ label }}">
+                        {% if feature in custom_labels and label in custom_labels[feature] %}
+                            {{ custom_labels[feature][label] }}
+                        {% else %}
+                            {{ label.replace("_", " ").title() }}
+                        {% endif %}
+                    </option>
+                {% endfor %}
+            </select><br><br>
+        {% endfor %}
+        <input type="submit" value="Predict">
+    </form>
+
+    {% if prediction %}
+        <h2>Prediction: {{ prediction }}</h2>
+    {% endif %}
+
+    {% if prediction == "Bad Credit" %}
+        <div class="suggestions-container">
+            <h3>🛠️ Suggestions to Improve:</h3>
+            <ul>
+                {% for suggestion in suggestions %}
+                    <li>Consider improving: <strong>{{ suggestion }}</strong></li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% elif prediction == "Good Credit" %}
+        <h3>You have a good credit status.</h3>
+    {% endif %}
+
+    {% if shap_plot %}
+        <h3>Feature Impact (SHAP VALUES)</h3>
+         <img src="data:image/png;base64,{{ shap_plot }}" alt="SHAP Feature Impact"> -->
+    <!-- {% endif %}
+</body>
+</html> -->

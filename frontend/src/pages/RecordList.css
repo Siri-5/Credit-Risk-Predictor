@@ -1,0 +1,83 @@
+.record-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.record-card {
+  background-color: #fdfdfd;
+  border-left: 6px solid #4a90e2;
+  border-radius: 12px;
+  padding: 20px 30px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease-in-out;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.record-card:hover {
+  transform: translateY(-4px);
+}
+
+.record-card strong {
+  display: inline-block;
+  width: 220px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.record-card br {
+  line-height: 1.8;
+}
+
+.bad-credit {
+  background-color: #fff0f0;
+  border-left-color: #e74c3c;
+}
+
+.good-credit{
+  background-color: #e7f2fe;
+}
+
+.suggestions {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #ffe6e6;
+  color: #c0392b;
+  border-left: 2px solid #c0392b;
+  border-right: 2px solid #c0392b;
+  border-radius: 8px;
+}
+
+.result {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #e6fff0;
+  color: #27ae60;
+  border-left: 2px solid #27ae60;
+  border-right: 2px solid #27ae60;
+  border-radius: 8px;
+  /* border: #27ae60; */
+  font-weight: bold;
+  font-size: 16px;
+}
+/* body, html {
+  background-color: rgba(34, 34, 34, 0.258);
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+} */
+
+.records-container {
+  /* height: 100vh;
+  width: 100%; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+  color: rgb(255, 255, 255);
+  background-color: #ffffff;
+}

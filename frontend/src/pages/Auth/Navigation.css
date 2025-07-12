@@ -1,0 +1,161 @@
+/* Navigation.css */
+
+.navigation-container {
+    position: fixed;
+    bottom: 2.5rem;
+    left: 20rem;
+    transform: translateX(50%) translateY(50%);
+    z-index: 50;
+    background-color: #0f0f0f;
+    border: 1px solid #ccc;
+    width: 30%;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+  }
+  
+  .nav-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .nav-link {
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+    text-decoration: none;
+    color: white;
+    margin-right: 1rem;
+  }
+  
+  .nav-link:hover {
+    transform: translateX(0.5rem);
+  }
+  
+  .nav-icon {
+    margin-right: 0.5rem;
+    margin-top: 2rem;
+  }
+  
+  .nav-text {
+    /* display: none; */
+    margin-top: 2rem;
+  }
+  .icon-style {
+    margin-right: 0.5rem; /* Equivalent to 'mr-2' */
+    margin-top: 2rem;     /* Equivalent to 'mt-[3rem]' */
+    width: 26px;          /* To control the size */
+    height: 26px;         /* To control the size */
+}
+.nav-item-name {
+    display: none; /* Hide by default */
+  }
+  .dropdown-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    outline: none;
+  }
+  
+  .username-text {
+    color: white;
+    font-weight: 500;
+  }
+  
+  .dropdown-arrow {
+    height: 1rem;  /* h-4 */
+    width: 1rem;   /* w-4 */
+    margin-left: 0.25rem; /* ml-1 */
+    transition: transform 0.3s ease;
+  }
+  
+  .rotated {
+    transform: rotate(180deg);
+  }
+  /* Dropdown menu */
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    margin-top: 0.5rem;
+    margin-right: 3.5rem;
+    width: 10rem;
+    background-color: white;
+    color: #4b5563; /* Tailwind's text-gray-600 */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 10;
+  }
+  
+  .top-user {
+    top: -5rem;
+  }
+  
+  .top-admin {
+    top: -6rem;
+  }
+  
+  .dropdown-item {
+    padding: 0.5rem 1rem;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .dropdown-item:hover {
+    background-color: #f3f4f6; /* Tailwind's gray-100 */
+  }
+  
+  .logout-btn {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* Auth links */
+  .auth-links {
+    display: flex;
+    list-style-type: none; 
+    padding: 0;
+    margin: 0;
+  }
+  
+  .auth-link {
+    display: flex;
+    align-items: center;
+    margin-top: 1.25rem;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .auth-link:hover {
+    transform: translateX(0.5rem);
+  }
+  
+  .auth-icon {
+    margin-right: 0.5rem;
+    margin-top: 4px;
+  }
+  
+  /* Extra spacing for REGISTER link */
+  .ml-1rem {
+    margin-left: 1rem;
+  }
+  
+  .nav-item-name {
+    margin-top: 2rem;
+    display: none;
+  }
+  .section-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  

@@ -1,0 +1,21 @@
+.spinner {
+    width: 4rem; /* h-16 (height) */
+    height: 4rem; /* w-16 (width) */
+    border-top-width: 4px; /* border-t-4 */
+    border-top-color: #4fd1c5; /* border-teal-500 */
+    border-style: solid;
+    border-radius: 50%; /* rounded-full */
+    border-opacity: 0.5; /* border-opacity-50 */
+    animation: spin 1s linear infinite; /* animate-spin */
+  }
+  
+  /* Keyframes for the spinning animation */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  

@@ -1,0 +1,110 @@
+/* .login-container {
+    padding-left: 10rem;
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #f9f9f9;
+    z-index: 100;
+    position: relative;
+  } */
+  
+  .login-form-container {
+    width: 25rem;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+  }
+  
+  .login-header {
+    font-weight: 650;
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: 3rem;
+    margin-right: 4rem;
+    margin-top: 2rem;
+  }
+  
+  .login-form {
+    width: 100%;
+  }
+  
+  .login-form-group {
+    margin: 0rem 0;
+  }
+  
+  .login-form-email,
+  .login-form-password {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .login-form-input {
+    width: 100%;
+    padding: 0.55rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #333;
+    box-sizing: border-box;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  
+  .login-form-input:focus {
+    border-color: #cdccd6;
+    box-shadow: 0 0 0 3px rgba(37, 37, 50, 0.2);
+    outline: none;
+  }
+  
+  .login-form-button {
+    width: 40%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    background-color: #4f46e5;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+  }
+  
+  .Login-form-text {
+    color: #333;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+  }
+  .register-container {
+    padding-left: 05rem;
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #f9f9f9;
+    z-index: 100;
+    justify-content: center;
+    /* align-self: center; */
+    position: relative; 
+    width: 100vw;
+    /* border: #333 solid; */
+  }
+  .reg-con {
+    width: 30vw;
+    position: absolute;
+    /* margin-top: 2%; */
+    top:5vh;
+    height: 60vh;;
+    padding: 2rem;
+    background-color: #f9fafb; /* Light background for a soft feel */
+    border-radius: 1rem;       /* Smooth rounded corners */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    display: flex;
+    flex-direction: column;
+    align-items: center;       /* Center content horizontally */
+    justify-content: center;
+    transition: all 0.3s ease; /* Smooth transition on hover etc */
+  }
+  
+  .reg-con:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+  }
